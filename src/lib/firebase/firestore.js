@@ -36,6 +36,7 @@ export async function updateRestaurantImageReference(
 }
 
 // Placeholder helper function to handle transaction updates with rating data (currently unused)
+// new function from step 8
 const updateWithRating = async (
   transaction,
   docRef,
@@ -52,6 +53,8 @@ const updateWithRating = async (
     numRatings: newNumRatings,
     sumRating: newSumRating,
     avgRating: newAverage,
+    //ADD NEW FIELD FOR USERID MAKING REVIEW TO USE AS SECURITY CHECK
+    lastReviewUserId: review.userId,
   });
 
   transaction.set(newRatingDocument, {
@@ -61,6 +64,7 @@ const updateWithRating = async (
 };
 
 // Placeholder function for adding a new review to a restaurant (currently not implemented)
+// new function from step 8
 export async function addReviewToRestaurant(db, restaurantId, review) {
         if (!restaurantId) {
                 throw new Error("No restaurant ID has been provided.");
@@ -77,7 +81,7 @@ export async function addReviewToRestaurant(db, restaurantId, review) {
                 );
 
                 // corrected line
-                await runTransaction(db, transaction =>
+                await runTransaction(db, (transaction) =>
                         updateWithRating(transaction, docRef, newRatingDocument, review)
                 );
         } catch (error) {
@@ -90,6 +94,7 @@ export async function addReviewToRestaurant(db, restaurantId, review) {
 }
 
 // Helper function to apply filtering and sorting options to a Firestore query
+// new functions from step 7
 function applyQueryFilters(q, { category, city, price, sort }) {
   // If category filter is provided, add it to the query
   if (category) {
@@ -131,12 +136,14 @@ export async function getRestaurants(db = db, filters = {}) {
     return {
       id: doc.id,                       // Include document ID
       ...doc.data(),                    // Spread document fields
+      // Only plain objects can be passed to Client Components from Server Components
       timestamp: doc.data().timestamp.toDate(), // Convert Firestore Timestamp to JS Date
     };
   });
 }
 
 // Subscribe to real-time restaurant updates using Firestore snapshots
+// new function from step 7
 export function getRestaurantsSnapshot(cb, filters = {}) {
   // Ensure the callback is a valid function
   if (typeof cb !== "function") {
@@ -157,6 +164,7 @@ export function getRestaurantsSnapshot(cb, filters = {}) {
       return {
         id: doc.id,
         ...doc.data(),
+        // Only plain objects can be passed to Client Components from Server Components
         timestamp: doc.data().timestamp.toDate(), // Convert Firestore Timestamp to JS Date
       };
     });
@@ -188,8 +196,27 @@ export async function getRestaurantById(db, restaurantId) {
 }
 
 // Placeholder for a real-time listener for a single restaurant (not yet implemented)
+// this function is complete in the nextjs-end codebase,
+// but is never introduced in the tutorial steps anywhere, 
+// so it remains non-functional at the end of the tutorial
 export function getRestaurantSnapshotById(restaurantId, cb) {
-  return; // No functionality yet
+  if (!restaurantId) {
+    console.log("Error: Invalid ID received: ", restaurantId);
+    return;
+  }
+
+  if (typeof cb !== "function") {
+    console.log("Error: The callback parameter is not a function");
+    return;
+  }
+
+  const docRef = doc(db, "restaurants", restaurantId);
+  return onSnapshot(docRef, (docSnap) => {
+    cb({
+      ...docSnap.data(),
+      timestamp: docSnap.data().timestamp.toDate(),
+    });
+  });
 }
 
 // Fetch all reviews for a specific restaurant
@@ -214,6 +241,7 @@ export async function getReviewsByRestaurantId(db, restaurantId) {
     return {
       id: doc.id,
       ...doc.data(),
+      // Only plain objects can be passed to Client Components from Server Components
       timestamp: doc.data().timestamp.toDate(), // Convert Firestore Timestamp to JS Date
     };
   });
@@ -240,6 +268,7 @@ export function getReviewsSnapshotByRestaurantId(restaurantId, cb) {
       return {
         id: doc.id,
         ...doc.data(),
+        // Only plain objects can be passed to Client Components from Server Components
         timestamp: doc.data().timestamp.toDate(),
       };
     });

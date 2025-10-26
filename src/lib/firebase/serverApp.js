@@ -21,6 +21,8 @@ export async function getAuthenticatedAppForUser() {
   // The token is set on the client after login and allows the server to authenticate the user.
   const authIdToken = (await cookies()).get("__session")?.value;
 
+  // console.log( authIdToken );
+
   // Firebase Server App is a newer feature in the Firebase SDK that enables
   // creating an app instance on the server using credentials (like the ID token)
   // obtained from the client. It is designed specifically for secure server environments.
@@ -43,6 +45,9 @@ export async function getAuthenticatedAppForUser() {
   // This ensures that `auth.currentUser` is available and accurate before continuing.
   await auth.authStateReady();
 
+   // console.log( JSON.stringify( auth.currentUser ) );
+
   // Return both the initialized Firebase Server App and the authenticated user.
+  // auth.currentUser contains uid, displayName, email amongst other properties
   return { firebaseServerApp, currentUser: auth.currentUser };
 }
