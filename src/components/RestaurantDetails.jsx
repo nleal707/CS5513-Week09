@@ -15,17 +15,7 @@ const RecipeDetails = ({
     <>
       <section className="recipe-image-section">
         <img src={recipe.photo} alt={recipe.name} />
-        <div className="actions">
-          {userId && (
-            <img
-              alt="review"
-              className="review"
-              onClick={() => {
-                setIsOpen(!isOpen);
-              }}
-              src="/review.svg"
-            />
-          )}
+        <div className="image-actions">
           <label
             onChange={(event) => handleRecipeImage(event.target)}
             htmlFor="upload-image"
@@ -87,6 +77,21 @@ const RecipeDetails = ({
           )}
           
           {children}
+        </div>
+      </section>
+      
+      <section className="reviews-section">
+        <div className="reviews-actions">
+          {userId && (
+            <img
+              alt="review"
+              className="review"
+              onClick={() => {
+                setIsOpen(!isOpen);
+              }}
+              src="/review.svg"
+            />
+          )}
         </div>
       </section>
     </>

@@ -368,6 +368,47 @@ a {
   }
 }
 
+/* Image Actions - Upload button positioned at bottom right of image */
+.image-actions {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 10;
+  
+  & img {
+    height: 3rem;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  
+  & img:hover {
+    transform: scale(1.1);
+  }
+}
+
+/* Reviews Actions - Review button positioned at bottom right of reviews section */
+.reviews-section {
+  position: relative;
+}
+
+.reviews-actions {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 10;
+  
+  & img {
+    height: 3rem;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  
+  & img:hover {
+    transform: scale(1.1);
+  }
+}
+
+/* Legacy actions class for backward compatibility */
 .actions {
   position: absolute;
   top: 1rem;
