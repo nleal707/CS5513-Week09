@@ -58,7 +58,7 @@ const ReviewDialog = ({
             />
           </p>
 
-          <input type="hidden" name="restaurantId" value={id} />
+          <input type="hidden" name="recipeId" value={id} />
           <input type="hidden" name="userId" value={userId} />
         </article>
         <footer>

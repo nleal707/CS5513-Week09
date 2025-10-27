@@ -1,5 +1,5 @@
-// Import function that generates sample (fake) restaurant and review data
-import { generateFakeRestaurantsAndReviews } from "@/src/lib/fakeRestaurants.js";
+// Import function that generates sample (fake) recipe and review data
+import { generateFakeRecipesAndReviews } from "@/src/lib/fakeRecipes.js";
 
 // Import Firestore functions used for database operations
 import {
@@ -21,17 +21,17 @@ import {
 // Import the Firestore database instance configured for the client
 import { db } from "@/src/lib/firebase/clientApp";
 
-// Function to update a restaurant’s photo URL in the Firestore database
-export async function updateRestaurantImageReference(
-  restaurantId,      // The document ID of the restaurant
+// Function to update a recipe's photo URL in the Firestore database
+export async function updateRecipeImageReference(
+  recipeId,      // The document ID of the recipe
   publicImageUrl     // The new public image URL to save
 ) {
-  // Create a reference to the specific restaurant document in the "restaurants" collection
-  const restaurantRef = doc(collection(db, "restaurants"), restaurantId);
+  // Create a reference to the specific recipe document in the "recipes" collection
+  const recipeRef = doc(collection(db, "recipes"), recipeId);
 
   // If the reference exists, update its "photo" field with the new image URL
-  if (restaurantRef) {
-    await updateDoc(restaurantRef, { photo: publicImageUrl });
+  if (recipeRef) {
+    await updateDoc(recipeRef, { photo: publicImageUrl });
   }
 }
 
@@ -63,11 +63,11 @@ const updateWithRating = async (
   });
 };
 
-// Placeholder function for adding a new review to a restaurant (currently not implemented)
+// Placeholder function for adding a new review to a recipe (currently not implemented)
 // new function from step 8
-export async function addReviewToRestaurant(db, restaurantId, review) {
-        if (!restaurantId) {
-                throw new Error("No restaurant ID has been provided.");
+export async function addReviewToRecipe(db, recipeId, review) {
+        if (!recipeId) {
+                throw new Error("No recipe ID has been provided.");
         }
 
         if (!review) {
@@ -75,9 +75,9 @@ export async function addReviewToRestaurant(db, restaurantId, review) {
         }
 
         try {
-                const docRef = doc(collection(db, "restaurants"), restaurantId);
+                const docRef = doc(collection(db, "recipes"), recipeId);
                 const newRatingDocument = doc(
-                        collection(db, `restaurants/${restaurantId}/ratings`)
+                        collection(db, `recipes/${recipeId}/ratings`)
                 );
 
                 // corrected line
@@ -86,7 +86,7 @@ export async function addReviewToRestaurant(db, restaurantId, review) {
                 );
         } catch (error) {
                 console.error(
-                        "There was an error adding the rating to the restaurant",
+                        "There was an error adding the rating to the recipe",
                         error
                 );
                 throw error;
@@ -95,18 +95,22 @@ export async function addReviewToRestaurant(db, restaurantId, review) {
 
 // Helper function to apply filtering and sorting options to a Firestore query
 // new functions from step 7
-function applyQueryFilters(q, { category, city, price, sort }) {
-  // If category filter is provided, add it to the query
-  if (category) {
-    q = query(q, where("category", "==", category));
+function applyQueryFilters(q, { cuisineType, difficulty, cookingTime, dietaryRestrictions, sort }) {
+  // If cuisine type filter is provided, add it to the query
+  if (cuisineType) {
+    q = query(q, where("cuisineType", "==", cuisineType));
   }
-  // If city filter is provided, add it to the query
-  if (city) {
-    q = query(q, where("city", "==", city));
+  // If difficulty filter is provided, add it to the query
+  if (difficulty) {
+    q = query(q, where("difficulty", "==", difficulty));
   }
-  // If price filter is provided, match restaurants with equal price level
-  if (price) {
-    q = query(q, where("price", "==", price.length));
+  // If cooking time filter is provided, add it to the query
+  if (cookingTime) {
+    q = query(q, where("cookingTime", "==", cookingTime));
+  }
+  // If dietary restrictions filter is provided, add it to the query
+  if (dietaryRestrictions) {
+    q = query(q, where("dietaryRestrictions", "array-contains", dietaryRestrictions));
   }
   // If sort is "Rating" (or unspecified), sort by average rating descending
   if (sort === "Rating" || !sort) {
@@ -116,16 +120,20 @@ function applyQueryFilters(q, { category, city, price, sort }) {
   else if (sort === "Review") {
     q = query(q, orderBy("numRatings", "desc"));
   }
+  // If sort is "Cooking Time", sort by cooking time ascending
+  else if (sort === "Cooking Time") {
+    q = query(q, orderBy("cookingTime", "asc"));
+  }
   // Return the modified query
   return q;
 }
 
-// Fetch restaurants from Firestore based on optional filters
-export async function getRestaurants(db = db, filters = {}) {
-  // Create a query reference for the "restaurants" collection
-  let q = query(collection(db, "restaurants"));
+// Fetch recipes from Firestore based on optional filters
+export async function getRecipes(db = db, filters = {}) {
+  // Create a query reference for the "recipes" collection
+  let q = query(collection(db, "recipes"));
 
-  // Apply category, city, price, and sort filters to the query
+  // Apply cuisine type, difficulty, cooking time, dietary restrictions, and sort filters to the query
   q = applyQueryFilters(q, filters);
 
   // Execute the query and get the documents
@@ -142,17 +150,17 @@ export async function getRestaurants(db = db, filters = {}) {
   });
 }
 
-// Subscribe to real-time restaurant updates using Firestore snapshots
+// Subscribe to real-time recipe updates using Firestore snapshots
 // new function from step 7
-export function getRestaurantsSnapshot(cb, filters = {}) {
+export function getRecipesSnapshot(cb, filters = {}) {
   // Ensure the callback is a valid function
   if (typeof cb !== "function") {
     console.log("Error: The callback parameter is not a function");
     return;
   }
 
-  // Start with a query for all restaurants
-  let q = query(collection(db, "restaurants"));
+  // Start with a query for all recipes
+  let q = query(collection(db, "recipes"));
 
   // Apply filters to the query
   q = applyQueryFilters(q, filters);
@@ -174,16 +182,16 @@ export function getRestaurantsSnapshot(cb, filters = {}) {
   });
 }
 
-// Fetch a single restaurant document by its ID
-export async function getRestaurantById(db, restaurantId) {
-  // Validate that a restaurant ID was provided
-  if (!restaurantId) {
-    console.log("Error: Invalid ID received: ", restaurantId);
+// Fetch a single recipe document by its ID
+export async function getRecipeById(db, recipeId) {
+  // Validate that a recipe ID was provided
+  if (!recipeId) {
+    console.log("Error: Invalid ID received: ", recipeId);
     return;
   }
 
-  // Get a reference to the restaurant document
-  const docRef = doc(db, "restaurants", restaurantId);
+  // Get a reference to the recipe document
+  const docRef = doc(db, "recipes", recipeId);
 
   // Retrieve the document snapshot from Firestore
   const docSnap = await getDoc(docRef);
@@ -195,13 +203,13 @@ export async function getRestaurantById(db, restaurantId) {
   };
 }
 
-// Placeholder for a real-time listener for a single restaurant (not yet implemented)
+// Placeholder for a real-time listener for a single recipe (not yet implemented)
 // this function is complete in the nextjs-end codebase,
 // but is never introduced in the tutorial steps anywhere, 
 // so it remains non-functional at the end of the tutorial
-export function getRestaurantSnapshotById(restaurantId, cb) {
-  if (!restaurantId) {
-    console.log("Error: Invalid ID received: ", restaurantId);
+export function getRecipeSnapshotById(recipeId, cb) {
+  if (!recipeId) {
+    console.log("Error: Invalid ID received: ", recipeId);
     return;
   }
 
@@ -210,7 +218,7 @@ export function getRestaurantSnapshotById(restaurantId, cb) {
     return;
   }
 
-  const docRef = doc(db, "restaurants", restaurantId);
+  const docRef = doc(db, "recipes", recipeId);
   return onSnapshot(docRef, (docSnap) => {
     cb({
       ...docSnap.data(),
@@ -219,17 +227,17 @@ export function getRestaurantSnapshotById(restaurantId, cb) {
   });
 }
 
-// Fetch all reviews for a specific restaurant
-export async function getReviewsByRestaurantId(db, restaurantId) {
-  // Validate restaurant ID
-  if (!restaurantId) {
-    console.log("Error: Invalid restaurantId received: ", restaurantId);
+// Fetch all reviews for a specific recipe
+export async function getReviewsByRecipeId(db, recipeId) {
+  // Validate recipe ID
+  if (!recipeId) {
+    console.log("Error: Invalid recipeId received: ", recipeId);
     return;
   }
 
-  // Create a query for the "ratings" subcollection under the restaurant
+  // Create a query for the "ratings" subcollection under the recipe
   const q = query(
-    collection(db, "restaurants", restaurantId, "ratings"),
+    collection(db, "recipes", recipeId, "ratings"),
     orderBy("timestamp", "desc") // Sort reviews by most recent first
   );
 
@@ -247,17 +255,17 @@ export async function getReviewsByRestaurantId(db, restaurantId) {
   });
 }
 
-// Set up a real-time snapshot listener for reviews of a given restaurant
-export function getReviewsSnapshotByRestaurantId(restaurantId, cb) {
-  // Validate restaurant ID
-  if (!restaurantId) {
-    console.log("Error: Invalid restaurantId received: ", restaurantId);
+// Set up a real-time snapshot listener for reviews of a given recipe
+export function getReviewsSnapshotByRecipeId(recipeId, cb) {
+  // Validate recipe ID
+  if (!recipeId) {
+    console.log("Error: Invalid recipeId received: ", recipeId);
     return;
   }
 
-  // Create a query for the restaurant's "ratings" subcollection ordered by timestamp
+  // Create a query for the recipe's "ratings" subcollection ordered by timestamp
   const q = query(
-    collection(db, "restaurants", restaurantId, "ratings"),
+    collection(db, "recipes", recipeId, "ratings"),
     orderBy("timestamp", "desc")
   );
 
@@ -278,24 +286,24 @@ export function getReviewsSnapshotByRestaurantId(restaurantId, cb) {
   });
 }
 
-// Add a batch of fake restaurants and their reviews to Firestore (for demo/testing)
-export async function addFakeRestaurantsAndReviews() {
-  // Generate fake restaurant and review data
-  const data = await generateFakeRestaurantsAndReviews();
+// Add a batch of fake recipes and their reviews to Firestore (for demo/testing)
+export async function addFakeRecipesAndReviews() {
+  // Generate fake recipe and review data
+  const data = await generateFakeRecipesAndReviews();
 
-  // Loop through each generated restaurant and its related ratings
-  for (const { restaurantData, ratingsData } of data) {
+  // Loop through each generated recipe and its related ratings
+  for (const { recipeData, ratingsData } of data) {
     try {
-      // Add a new restaurant document to Firestore
+      // Add a new recipe document to Firestore
       const docRef = await addDoc(
-        collection(db, "restaurants"),
-        restaurantData
+        collection(db, "recipes"),
+        recipeData
       );
 
       // Add all associated review documents to its "ratings" subcollection
       for (const ratingData of ratingsData) {
         await addDoc(
-          collection(db, "restaurants", docRef.id, "ratings"),
+          collection(db, "recipes", docRef.id, "ratings"),
           ratingData
         );
       }
@@ -304,5 +312,19 @@ export async function addFakeRestaurantsAndReviews() {
       console.log("There was an error adding the document");
       console.error("Error adding document: ", e);
     }
+  }
+}
+
+// Add a recipe to Firestore (for AI-generated recipes)
+export async function addRecipeToFirestore(recipeData) {
+  try {
+    const docRef = await addDoc(
+      collection(db, "recipes"),
+      recipeData
+    );
+    return docRef.id;
+  } catch (e) {
+    console.error("Error adding recipe: ", e);
+    throw e;
   }
 }

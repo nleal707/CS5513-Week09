@@ -1,4 +1,4 @@
-// The filters shown on the restaurant listings page
+// The filters shown on the recipe listings page
 
 import Tag from "@/src/components/Tag.jsx";
 
@@ -38,7 +38,7 @@ export default function Filters({ filters, setFilters }) {
         <summary>
           <img src="/filter.svg" alt="filter" />
           <div>
-            <p>Restaurants</p>
+            <p>Recipes</p>
             <p>Sorted by {filters.sort || "Rating"}</p>
           </div>
         </summary>
@@ -51,7 +51,7 @@ export default function Filters({ filters, setFilters }) {
           }}
         >
           <FilterSelect
-            label="Category"
+            label="Cuisine Type"
             options={[
               "",
               "Italian",
@@ -60,54 +60,64 @@ export default function Filters({ filters, setFilters }) {
               "Mexican",
               "Indian",
               "Mediterranean",
-              "Caribbean",
-              "Cajun",
+              "American",
+              "French",
+              "Thai",
+              "Korean",
+              "Vietnamese",
+              "Greek",
+              "Spanish",
               "German",
-              "Russian",
-              "Cuban",
-              "Organic",
-              "Tapas",
+              "Middle Eastern"
             ]}
-            value={filters.category}
-            onChange={(event) => handleSelectionChange(event, "category")}
-            name="category"
+            value={filters.cuisineType}
+            onChange={(event) => handleSelectionChange(event, "cuisineType")}
+            name="cuisineType"
             icon="/food.svg"
           />
 
           <FilterSelect
-            label="City"
-            options={[
-              "",
-              "New York",
-              "Los Angeles",
-              "London",
-              "Paris",
-              "Tokyo",
-              "Mumbai",
-              "Dubai",
-              "Amsterdam",
-              "Seoul",
-              "Singapore",
-              "Istanbul",
-            ]}
-            value={filters.city}
-            onChange={(event) => handleSelectionChange(event, "city")}
-            name="city"
-            icon="/location.svg"
+            label="Difficulty"
+            options={["", "Easy", "Medium", "Hard"]}
+            value={filters.difficulty}
+            onChange={(event) => handleSelectionChange(event, "difficulty")}
+            name="difficulty"
+            icon="/sortBy.svg"
           />
 
           <FilterSelect
-            label="Price"
-            options={["", "$", "$$", "$$$", "$$$$"]}
-            value={filters.price}
-            onChange={(event) => handleSelectionChange(event, "price")}
-            name="price"
+            label="Cooking Time"
+            options={["", "< 15 min", "15-30 min", "30-60 min", "60+ min"]}
+            value={filters.cookingTime}
+            onChange={(event) => handleSelectionChange(event, "cookingTime")}
+            name="cookingTime"
             icon="/price.svg"
           />
 
           <FilterSelect
+            label="Dietary Restrictions"
+            options={[
+              "",
+              "Vegetarian",
+              "Vegan",
+              "Gluten-Free",
+              "Dairy-Free",
+              "Nut-Free",
+              "Low-Carb",
+              "Keto",
+              "Paleo",
+              "Halal",
+              "Kosher"
+            ]}
+            value={filters.dietaryRestrictions}
+            onChange={(event) => handleSelectionChange(event, "dietaryRestrictions")}
+            name="dietaryRestrictions"
+            icon="/location.svg"
+          />
+
+          <FilterSelect
             label="Sort"
-            options={["Rating", "Review"]}
+            options={["Rating", "Review", "Cooking Time"]}
             value={filters.sort}
             onChange={(event) => handleSelectionChange(event, "sort")}
             name="sort"
@@ -121,9 +131,10 @@ export default function Filters({ filters, setFilters }) {
                 type="reset"
                 onClick={() => {
                   setFilters({
-                    city: "",
-                    category: "",
-                    price: "",
+                    cuisineType: "",
+                    difficulty: "",
+                    cookingTime: "",
+                    dietaryRestrictions: "",
                     sort: "",
                   });
                 }}

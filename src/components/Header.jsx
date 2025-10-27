@@ -17,8 +17,8 @@ import {
   onIdTokenChanged,
 } from "@/src/lib/firebase/auth.js";
 
-// Import helper function for adding test restaurant and review data to Firestore
-import { addFakeRestaurantsAndReviews } from "@/src/lib/firebase/firestore.js";
+// Import helper function for adding test recipe and review data to Firestore
+import { addFakeRecipesAndReviews } from "@/src/lib/firebase/firestore.js";
 
 // Import cookie utility functions for setting and deleting cookies in Next.js
 import { setCookie, deleteCookie } from "cookies-next";
@@ -40,7 +40,7 @@ function useUserSession(initialUser) {
         await deleteCookie("__session");
       }
 
-      // If the currently logged-in user hasn’t changed, do nothing
+      // If the currently logged-in user hasn't changed, do nothing
       if (initialUser?.uid === user?.uid) {
         return;
       }
@@ -57,7 +57,7 @@ function useUserSession(initialUser) {
 
 // Default exported Header component, which displays the app header and sign-in/out UI
 export default function Header({ initialUser }) {
-  // Use the custom hook to keep track of the user’s authentication state
+  // Use the custom hook to keep track of the user's authentication state
   const user = useUserSession(initialUser);
 
   // Handler function to sign the user out when the "Sign Out" link is clicked
@@ -72,13 +72,13 @@ export default function Header({ initialUser }) {
     signInWithGoogle();      // Trigger Firebase sign-in with Google
   };
 
-  // Render the component’s UI
+  // Render the component's UI
   return (
     <header>
       {/* App logo and title that links to the homepage */}
       <Link href="/" className="logo">
-        <img src="/friendly-eats.svg" alt="FriendlyEats" />
-        Friendly Eats
+        <img src="/friendly-eats.svg" alt="RecipeAI" />
+        RecipeAI
       </Link>
 
       {/* Conditional rendering: show different UI depending on whether the user is signed in */}
@@ -87,13 +87,13 @@ export default function Header({ initialUser }) {
           {/* If a user is signed in, show their profile info and menu */}
           <div className="profile">
             <p>
-              {/* Show the user’s profile photo or a placeholder */}
+              {/* Show the user's profile photo or a placeholder */}
               <img
                 className="profileImage"
                 src={user.photoURL || "/profile.svg"}
                 alt={user.email}
               />
-              {/* Display the user’s display name */}
+              {/* Display the user's display name */}
               {user.displayName}
             </p>
 
@@ -101,13 +101,13 @@ export default function Header({ initialUser }) {
             <div className="menu">
               ...
               <ul>
-                {/* Show user’s name again inside the menu */}
+                {/* Show user's name again inside the menu */}
                 <li>{user.displayName}</li>
 
-                {/* Option to add sample restaurant data for testing */}
+                {/* Option to add sample recipe data for testing */}
                 <li>
-                  <a href="#" onClick={addFakeRestaurantsAndReviews}>
-                    Add sample restaurants
+                  <a href="#" onClick={addFakeRecipesAndReviews}>
+                    Add sample recipes
                   </a>
                 </li>
 

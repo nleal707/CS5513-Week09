@@ -10,12 +10,12 @@ service cloud.firestore {
   }
 
   match /databases/{database}/documents {
-    // Restaurants:
+    // Recipes:
     //   - Authenticated user can read
     //   - Authenticated user can create/update (for demo purposes only)
     //   - Updates are allowed if no fields are added and name is unchanged
     //   - Deletes are not allowed (default)
-    match /restaurants/{restaurantId} {
+    match /recipes/{recipeId} {
       allow read;
       allow update: if request.resource.data.lastReviewUserId != null;
       // allow write: if true;
@@ -36,6 +36,12 @@ service cloud.firestore {
           // allow update: if request.auth != null
           //              && request.resource.data.userId == request.auth.uid;
       }
+    }
+    
+    // User favorites:
+    //   - Users can read/write their own favorites
+    match /users/{userId}/favorites/{favoriteId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
     }
   }
 }
