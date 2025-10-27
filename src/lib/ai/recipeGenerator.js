@@ -1,4 +1,4 @@
-import { gemini20Flash, googleAI } from "@genkit-ai/googleai";
+import { googleAI } from "@genkit-ai/googleai";
 import { genkit } from "genkit";
 import { Timestamp, addDoc, collection, getFirestore } from "firebase/firestore";
 import { getAuthenticatedAppForUser } from "@/src/lib/firebase/serverApp";
@@ -16,7 +16,7 @@ export async function generateRecipe(ingredients, filters = {}) {
     // Configure a Genkit instance
     const ai = genkit({
       plugins: [googleAI()],
-      model: gemini20Flash, // set default model
+      model: googleAI.model('gemini-2.5-flash'), // stable production model
     });
 
     // Create a prompt based on available ingredients and filters
