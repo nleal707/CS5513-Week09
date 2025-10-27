@@ -322,6 +322,7 @@ a {
   margin: 0 auto;
   padding: 2rem;
   background: white;
+  border-radius: 12px;
 }
 
 .details {
