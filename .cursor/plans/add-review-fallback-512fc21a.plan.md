@@ -1,4 +1,4 @@
-<!-- 512fc21a-b873-4ecb-84b8-c9148b6ed18a 9d0d669d-d80f-48ae-9b3b-e474b8ef29ed -->
+<!-- 512fc21a-b873-4ecb-84b8-c9148b6ed18a 1021b8b9-9b3a-4632-8f50-a1ac905c04d3 -->
 # Improve Recipe Image Diversity
 
 ## Current Situation
@@ -39,7 +39,7 @@ Use the free Unsplash API to fetch real, high-quality food photos dynamically ba
 
 1. Sign up for Unsplash API key (free)
 2. Create helper function to fetch images by recipe name or cuisine type
-3. Update `getRandomRecipeImage()` to call Unsplash API
+3. Update `getRandomRecipeImage()` to call Unsplash APIntire ro
 4. Add fallback to stock images if API fails or rate limit reached
 5. Optionally cache image URLs in Firestore to reduce API calls
 

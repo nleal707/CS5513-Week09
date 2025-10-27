@@ -216,20 +216,30 @@ article {
 .recipes {
   display: grid;
   margin-top: 20px;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-
-  gap: 40px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
 
   & li {
     background: white;
-    max-width: 300px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+  }
+
+  & li:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 
   & a {
     color: #333;
     display: flex;
     flex-direction: column;
-    flex: 2 1 100%;
+    flex: 1;
+    height: 100%;
   }
 
   & h2 {
@@ -239,17 +249,16 @@ article {
 
 .image-cover {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  max-height: 300px;
-  min-height: 300px;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
   position: relative;
+  background: #f0f0f0;
 
   & img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    position: absolute;
+    object-position: center;
   }
 }
 
@@ -273,6 +282,20 @@ a {
 
 .recipe__details {
   padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  & h2 {
+    margin: 0 0 8px 0;
+    font-size: 1.25rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
 }
 
 .recipe__rating {
@@ -1127,12 +1150,42 @@ a {
   background: #0056b3;
 }
 
-@media (max-width: 768px) {
-  .featured-recipe__card a {
+/* Tablet and below */
+@media (max-width: 1024px) {
+  .recipes {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .recipes {
     grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 0 16px;
   }
   
-  .featured-recipe__image {
-    height: 200px;
+  .image-cover {
+    aspect-ratio: 4 / 3;
+  }
+  
+  .recipe__details {
+    padding: 16px;
+    
+    & h2 {
+      font-size: 1.125rem;
+    }
+  }
+}
+
+/* Small mobile */
+@media (max-width: 480px) {
+  .recipes {
+    gap: 12px;
+  }
+  
+  .recipe__details {
+    padding: 12px;
   }
 }
