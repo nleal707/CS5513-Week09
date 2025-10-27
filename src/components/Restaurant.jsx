@@ -37,6 +37,12 @@ export default function Recipe({
     if (!image) {
       return;
     }
+    
+    // Check if user is authenticated
+    if (!userId) {
+      alert("You must be logged in to upload photos.");
+      return;
+    }
 
     const imageURL = await updateRecipeImage(id, image);
     setRecipeDetails({ ...recipeDetails, photo: imageURL });

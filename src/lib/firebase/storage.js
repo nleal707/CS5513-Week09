@@ -14,12 +14,16 @@ export async function updateRecipeImage(recipeId, image) {
       throw new Error("A valid image has not been provided.");
     }
 
+    // Note: Authentication is enforced by Firebase Storage rules
+    // Client-side validation is handled in the calling component
+
     const publicImageUrl = await uploadImage(recipeId, image);
     await updateRecipeImageReference(recipeId, publicImageUrl);
 
     return publicImageUrl;
   } catch (error) {
     console.error("Error processing request:", error);
+    throw error; // Re-throw to allow caller to handle
   }
 }
 

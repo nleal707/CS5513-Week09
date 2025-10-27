@@ -26,20 +26,22 @@ const RecipeDetails = ({
               src="/review.svg"
             />
           )}
-          <label
-            onChange={(event) => handleRecipeImage(event.target)}
-            htmlFor="upload-image"
-            className="add"
-          >
-            <input
-              name=""
-              type="file"
-              id="upload-image"
-              className="file-input hidden w-full h-full"
-            />
+          {userId && (
+            <label
+              onChange={(event) => handleRecipeImage(event.target)}
+              htmlFor="upload-image"
+              className="add"
+            >
+              <input
+                name=""
+                type="file"
+                id="upload-image"
+                className="file-input hidden w-full h-full"
+              />
 
-            <img className="add-image" src="/add.svg" alt="Add image" />
-          </label>
+              <img className="add-image" src="/add.svg" alt="Add image" />
+            </label>
+          )}
         </div>
       </section>
       
