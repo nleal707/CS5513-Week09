@@ -1158,6 +1158,17 @@ a {
   }
 }
 
+/* Featured recipe mobile adjustments */
+@media (max-width: 768px) {
+  .featured-recipe__card a {
+    grid-template-columns: 1fr;
+  }
+  
+  .featured-recipe__image {
+    height: 200px;
+  }
+}
+
 /* Mobile */
 @media (max-width: 640px) {
   .recipes {
