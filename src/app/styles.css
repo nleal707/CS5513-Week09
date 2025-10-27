@@ -226,7 +226,7 @@ article {
   }
 
   & a {
-    color: black;
+    color: #333;
     display: flex;
     flex-direction: column;
     flex: 2 1 100%;
@@ -533,14 +533,15 @@ a {
   }
 
   & p:first-child {
-    font-weight: 300;
+    color: #333;
+    font-weight: 400;
     font-size: 1.25rem;
     line-height: 1.75rem;
     margin-bottom: 2px;
   }
 
   & p:last-child {
-    color: rgb(42 72 101);
+    color: #666;
     font-weight: 600;
     font-size: 0.875rem;
     line-height: 1.25rem;
@@ -686,12 +687,12 @@ a {
 }
 
 .ingredient-input__add-btn {
-  padding: 0.75rem 1.5rem;
+  padding: 1rem 2rem;
   background: #007bff;
   color: white;
   border: none;
   border-radius: 8px;
-  font-size: 1rem;
+  font-size: 1.1rem;
   cursor: pointer;
   transition: background-color 0.2s;
 }
@@ -967,10 +968,6 @@ a {
   transition: transform 0.3s ease;
 }
 
-.featured-recipe__card:hover {
-  transform: translateY(-5px);
-}
-
 .featured-recipe__card a {
   display: grid;
   grid-template-columns: 1fr 1.5fr;
@@ -990,6 +987,7 @@ a {
   object-fit: cover;
 }
 
+/*
 .featured-recipe__badge {
   position: absolute;
   top: 1rem;
@@ -1001,6 +999,7 @@ a {
   font-weight: 600;
   font-size: 0.875rem;
 }
+  */
 
 .featured-recipe__content {
   padding: 2rem;
@@ -1012,14 +1011,16 @@ a {
 
 .featured-recipe__content h3 {
   font-size: 1.5rem;
-  color: #2a4865;
+  color: #333;
   margin-bottom: 1rem;
+  font-weight: 400;
 }
 
 .featured-recipe__description {
-  color: #555;
+  color: #666;
   line-height: 1.6;
   margin-bottom: 1.5rem;
+  font-size: 1.1rem;
 }
 
 .featured-recipe__meta {
@@ -1039,19 +1040,19 @@ a {
 
 .featured-recipe__cta {
   align-self: flex-start;
-  background: #667eea;
+  background: #007bff;
   color: white;
   border: none;
-  padding: 0.75rem 1.5rem;
+  padding: 1rem 2rem;
   border-radius: 8px;
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.3s ease;
 }
 
 .featured-recipe__cta:hover {
-  background: #5568d3;
+  background: #0056b3;
 }
 
 @media (max-width: 768px) {
