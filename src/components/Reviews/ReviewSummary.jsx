@@ -11,6 +11,15 @@ export async function GeminiSummary({ recipeId }) {
     recipeId
   );
 
+  // Check if there are no reviews
+  if (!reviews || reviews.length === 0) {
+    return (
+      <div className="recipe__review_summary">
+        <p>No reviews yet. Be the first to review this recipe!</p>
+      </div>
+    );
+  }
+
   const reviewSeparator = "@";
   const prompt = `
     Based on the following recipe reviews, 
