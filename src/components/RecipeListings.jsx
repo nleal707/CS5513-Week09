@@ -48,10 +48,9 @@ const RecipeRating = ({ recipe }) => (
 
 const RecipeMetadata = ({ recipe }) => (
   <div className="recipe__meta">
-    <p>
-      {recipe.cuisineType} | {recipe.difficulty} | {recipe.cookingTime}
-    </p>
-    <p>{recipe.dietaryRestrictions?.join(", ") || "No restrictions"}</p>
+    <span>🍳 {recipe.cuisineType}</span>
+    <span>⏱️ {recipe.cookingTime}</span>
+    <span>📊 {recipe.difficulty}</span>
   </div>
 );
 

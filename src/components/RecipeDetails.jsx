@@ -52,9 +52,11 @@ const RecipeDetails = ({
             <span>({recipe.numRatings})</span>
           </div>
 
-          <p>
-            {recipe.cuisineType} | {recipe.difficulty} | {recipe.cookingTime}
-          </p>
+          <div className="recipe__meta">
+            <span>🍳 {recipe.cuisineType}</span>
+            <span>⏱️ {recipe.cookingTime}</span>
+            <span>📊 {recipe.difficulty}</span>
+          </div>
           <p>{recipe.dietaryRestrictions?.join(", ") || "No restrictions"}</p>
           
           {recipe.description && (

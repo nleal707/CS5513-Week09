@@ -259,10 +259,16 @@ a {
 
 .recipe__meta {
   display: flex;
-  font-weight: 500;
-  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
   align-items: center;
   margin-bottom: 10px;
+}
+
+.recipe__meta span {
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: #555;
 }
 
 .recipe__details {
