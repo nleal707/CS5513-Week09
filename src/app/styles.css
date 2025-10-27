@@ -302,6 +302,13 @@ a {
   margin: 1.5rem 0;
 }
 
+.recipe__review_summary h3 {
+  margin-bottom: .5rem;
+  color: #333;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
 /* Recipe Image Section */
 .recipe-image-section {
   width: 100%;
@@ -618,6 +625,13 @@ a {
 /* Recipe-specific styles */
 .recipe__description__div {
   margin: 1.5rem 0;
+}
+
+.recipe__description__div h3 {
+  margin-bottom: .5rem;
+  color: #333;
+  font-size: 1.1rem;
+  font-weight: 600;
 }
 
 .recipe__description {

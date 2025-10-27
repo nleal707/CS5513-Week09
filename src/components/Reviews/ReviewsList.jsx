@@ -26,6 +26,7 @@ export default async function ReviewsList({ recipeId, userId }) {
 export function ReviewsListSkeleton({ numReviews }) {
   return (
     <article>
+      <h3>All Reviews:</h3>
       <ul className="reviews">
         <ul>
           {Array(numReviews)
