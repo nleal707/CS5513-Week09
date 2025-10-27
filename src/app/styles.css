@@ -368,7 +368,7 @@ a {
   }
 }
 
-/* Image Actions - Upload button positioned at bottom right of image */
+/* Image Actions - Upload button positioned at bottom right of image 
 .image-actions {
   position: absolute;
   bottom: 1rem;
@@ -386,7 +386,7 @@ a {
   }
 }
 
-/* Reviews Actions - Review button positioned at bottom right of reviews section */
+ Reviews Actions - Review button positioned at bottom right of reviews section
 .reviews-section {
   position: relative;
 }
@@ -406,9 +406,9 @@ a {
   & img:hover {
     transform: scale(1.1);
   }
-}
 
-/* Legacy actions class for backward compatibility */
+
+ Legacy actions class for backward compatibility */
 .actions {
   position: absolute;
   top: 1rem;
