@@ -868,6 +868,25 @@ a {
   background: #545b62;
 }
 
+.ingredient-input__login-prompt {
+  text-align: center;
+  padding: 2rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.ingredient-input__login-prompt p {
+  margin: 0.5rem 0;
+  color: #666;
+}
+
+.ingredient-input__login-prompt p:first-child {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+}
+
 /* Loading Screen Styles */
 .loading-screen {
   position: fixed;

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { randomData } from "@/src/lib/randomData.js";
 
-export default function IngredientInput({ onGenerateRecipes, isLoading }) {
+export default function IngredientInput({ onGenerateRecipes, isLoading, userId }) {
   const [ingredients, setIngredients] = useState([]);
   const [newIngredient, setNewIngredient] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -48,6 +48,22 @@ export default function IngredientInput({ onGenerateRecipes, isLoading }) {
       onGenerateRecipes(ingredients);
     }
   };
+
+  // If user is not authenticated, show login prompt
+  if (!userId) {
+    return (
+      <div className="ingredient-input">
+        <div className="ingredient-input__header">
+          <h2>AI-Powered Recipe Generator</h2>
+          <p>Sign in to generate personalized recipes based on your available ingredients</p>
+        </div>
+        <div className="ingredient-input__login-prompt">
+          <p>🔒 Please log in to use the recipe generator</p>
+          <p>Click "Sign In" in the top right corner to get started</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="ingredient-input">

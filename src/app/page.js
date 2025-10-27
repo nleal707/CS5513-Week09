@@ -34,7 +34,7 @@ export default async function Home(props) {
   // ?cuisineType=Italian&difficulty=Easy&sort=Rating
   
   // Get the Firebase server app instance authenticated for the current user session
-  const { firebaseServerApp } = await getAuthenticatedAppForUser();
+  const { firebaseServerApp, currentUser } = await getAuthenticatedAppForUser();
   
   // Get the Firestore database instance
   const db = getFirestore(firebaseServerApp);
@@ -49,7 +49,7 @@ export default async function Home(props) {
   // The <main> element contains the IngredientInput, FeaturedRecipe, and RecipeListings components with initial data
   return (
     <main className="main__home">
-      <IngredientInputWrapper />
+      <IngredientInputWrapper initialUserId={currentUser?.uid || ""} />
       {latestAIRecipe && <FeaturedRecipe recipe={latestAIRecipe} />}
       <RecipeListings
         initialRecipes={recipes}  // Pass the loaded recipes to the component
