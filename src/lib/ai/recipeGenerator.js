@@ -72,38 +72,22 @@ export async function generateRecipe(ingredients, filters = {}) {
   }
 }
 
-// Helper function to clean JSON response from markdown code blocks and fix common issues
+// Helper function to clean JSON response from markdown code blocks
 function cleanJsonResponse(text) {
+  // Remove markdown code blocks if present
   let cleaned = text.trim();
   
-  // Remove markdown code blocks
+  // Remove ```json or ``` from start
   if (cleaned.startsWith('```json')) {
     cleaned = cleaned.substring(7);
   } else if (cleaned.startsWith('```')) {
     cleaned = cleaned.substring(3);
   }
+  
+  // Remove ``` from end
   if (cleaned.endsWith('```')) {
     cleaned = cleaned.substring(0, cleaned.length - 3);
   }
-  
-  // Remove any text before the first {
-  const jsonStart = cleaned.indexOf('{');
-  if (jsonStart > 0) {
-    cleaned = cleaned.substring(jsonStart);
-  }
-  
-  // Remove any text after the last }
-  const jsonEnd = cleaned.lastIndexOf('}');
-  if (jsonEnd > 0 && jsonEnd < cleaned.length - 1) {
-    cleaned = cleaned.substring(0, jsonEnd + 1);
-  }
-  
-  // Fix common JSON issues
-  cleaned = cleaned
-    .replace(/,\s*}/g, '}')  // Remove trailing commas before }
-    .replace(/,\s*]/g, ']')  // Remove trailing commas before ]
-    .replace(/(\w+):/g, '"$1":')  // Add quotes around unquoted keys
-    .replace(/:\s*([^",{\[\]]+)([,}])/g, ': "$1"$2');  // Add quotes around unquoted string values
   
   return cleaned.trim();
 }
@@ -128,7 +112,6 @@ function createRecipePrompt(ingredients, filters) {
   }
   
   prompt += `\nPlease create a complete recipe and return it as a valid JSON object with the following structure:
-
 {
   "name": "Recipe Name",
   "description": "Brief description of the dish",
@@ -142,8 +125,6 @@ function createRecipePrompt(ingredients, filters) {
   "prepTime": "15 min",
   "calories": 300
 }
-
-IMPORTANT: Return ONLY a valid JSON object. Do not include any markdown formatting, explanations, or additional text. The response must start with { and end with }.
 
 Make sure the recipe is practical, delicious, and uses the provided ingredients as the main components. Return ONLY the JSON object, no additional text.`;
 
