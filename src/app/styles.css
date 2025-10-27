@@ -357,29 +357,6 @@ a {
   width: auto;
 }
 
-/* AI Review Summary Section */
-.recipe__review_summary {
-  max-width: 900px;
-  margin: 2rem auto;
-  padding: 1.5rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 12px;
-  color: white;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.recipe__review_summary p:first-child {
-  font-size: 1.1rem;
-  line-height: 1.6;
-  margin-bottom: 0.75rem;
-}
-
-.recipe__review_summary p:last-child {
-  font-size: 0.9rem;
-  opacity: 0.9;
-  font-style: italic;
-}
-
 .reviews {
   & .review__item {
     padding: 40px;

@@ -16,6 +16,7 @@ export default function Recipe({
   id,
   initialRecipe,
   initialUserId,
+  children,
 }) {
   const [recipeDetails, setRecipeDetails] = useState(initialRecipe);
   const [isOpen, setIsOpen] = useState(false);
@@ -60,7 +61,9 @@ export default function Recipe({
         handleRecipeImage={handleRecipeImage}
         setIsOpen={setIsOpen}
         isOpen={isOpen}
-      />
+      >
+        {children}
+      </RecipeDetails>
       {userId && (
         <Suspense fallback={<p>Loading...</p>}>
           <ReviewDialog

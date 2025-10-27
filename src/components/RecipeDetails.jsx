@@ -9,6 +9,7 @@ const RecipeDetails = ({
   handleRecipeImage,
   setIsOpen,
   isOpen,
+  children,
 }) => {
   return (
     <>
@@ -84,6 +85,8 @@ const RecipeDetails = ({
               </ol>
             </div>
           )}
+          
+          {children}
         </div>
       </section>
     </>

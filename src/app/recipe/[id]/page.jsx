@@ -29,12 +29,11 @@ export default async function Home(props) {
         id={params.id}
         initialRecipe={recipe}
         initialUserId={currentUser?.uid || ""}
-      />
-      
-      <Suspense fallback={<GeminiSummarySkeleton />}>
-        <GeminiSummary recipeId={params.id} />
-      </Suspense>
-      
+      >
+        <Suspense fallback={<GeminiSummarySkeleton />}>
+          <GeminiSummary recipeId={params.id} />
+        </Suspense>
+      </Recipe>
       <Suspense
         fallback={<ReviewsListSkeleton numReviews={recipe.numRatings} />}
       >
