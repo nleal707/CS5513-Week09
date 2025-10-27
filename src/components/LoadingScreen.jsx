@@ -14,13 +14,17 @@ export default function LoadingScreen({ message = "Generating your recipe...", c
     "Finalizing your recipe..."
   ];
 
-  // Rotate through cooking messages every 2 seconds
+  // Rotate through cooking messages every 3 seconds, stopping at the last message
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentMessageIndex((prevIndex) => 
-        (prevIndex + 1) % cookingMessages.length
-      );
-    }, 2000);
+      setCurrentMessageIndex((prevIndex) => {
+        // Stop at the last message (don't loop back to the beginning)
+        if (prevIndex >= cookingMessages.length - 1) {
+          return prevIndex; // Stay at the last message
+        }
+        return prevIndex + 1;
+      });
+    }, 3000); // Changed from 2000ms to 3000ms (3 seconds)
 
     return () => clearInterval(interval);
   }, []);

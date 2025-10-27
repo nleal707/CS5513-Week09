@@ -2,7 +2,7 @@
 import RecipeListings from "@/src/components/RecipeListings.jsx"; 
 
 // Import the getRecipes function for fetching recipe data from Firestore
-import { getRecipes } from "@/src/lib/firebase/firestore.js";
+import { getRecipes, getLatestAIRecipe } from "@/src/lib/firebase/firestore.js";
 
 // Import a function that returns a Firebase app instance authenticated for the current user
 import { getAuthenticatedAppForUser } from "@/src/lib/firebase/serverApp.js";
@@ -13,7 +13,10 @@ import { getFirestore } from "firebase/firestore";
 // Import the ingredient input wrapper component
 import IngredientInputWrapper from "@/src/components/IngredientInputWrapper.jsx";
 
-// Instruct Next.js to render this route dynamically on the server each time it’s requested
+// Import the featured recipe component
+import FeaturedRecipe from "@/src/components/FeaturedRecipe.jsx";
+
+// Instruct Next.js to render this route dynamically on the server each time it's requested
 // Without this, Next.js might pre-render the page at build time (static generation)
 export const dynamic = "force-dynamic";
 
@@ -33,17 +36,21 @@ export default async function Home(props) {
   // Get the Firebase server app instance authenticated for the current user session
   const { firebaseServerApp } = await getAuthenticatedAppForUser();
   
+  // Get the Firestore database instance
+  const db = getFirestore(firebaseServerApp);
+  
   // Fetch the recipe data from Firestore using the authenticated app and search parameters
-  const recipes = await getRecipes(
-    getFirestore(firebaseServerApp), // Get the Firestore instance from the Firebase app
-    searchParams                     // Pass in the URL query filters for server-side filtering
-  );
+  const recipes = await getRecipes(db, searchParams);
+  
+  // Fetch the most recent AI-generated recipe
+  const latestAIRecipe = await getLatestAIRecipe(db);
   
   // Return the rendered page markup (JSX)
-  // The <main> element contains the IngredientInput and RecipeListings components with initial data
+  // The <main> element contains the IngredientInput, FeaturedRecipe, and RecipeListings components with initial data
   return (
     <main className="main__home">
       <IngredientInputWrapper />
+      {latestAIRecipe && <FeaturedRecipe recipe={latestAIRecipe} />}
       <RecipeListings
         initialRecipes={recipes}  // Pass the loaded recipes to the component
         searchParams={searchParams}       // Pass the search parameters for client-side filtering or display

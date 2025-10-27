@@ -16,6 +16,7 @@ import {
   where,            // Adds filters to queries
   addDoc,           // Adds a new document to a collection
   getFirestore,     // Returns a Firestore instance (usually from an app)
+  limit,            // Limits the number of documents returned by a query
 } from "firebase/firestore";
 
 // Import the Firestore database instance configured for the client
@@ -327,4 +328,24 @@ export async function addRecipeToFirestore(recipeData) {
     console.error("Error adding recipe: ", e);
     throw e;
   }
+}
+
+// Get the most recent AI-generated recipe
+export async function getLatestAIRecipe(db) {
+  const recipesRef = collection(db, 'recipes');
+  const q = query(
+    recipesRef,
+    where('aiGenerated', '==', true),
+    orderBy('timestamp', 'desc'),
+    limit(1)
+  );
+  
+  const snapshot = await getDocs(q);
+  if (snapshot.empty) return null;
+  
+  const doc = snapshot.docs[0];
+  return {
+    id: doc.id,
+    ...doc.data(),
+  };
 }
