@@ -12,37 +12,38 @@ const RecipeDetails = ({
   children,
 }) => {
   return (
-    <section className="img__section">
-      <img src={recipe.photo} alt={recipe.name} />
+    <>
+      <section className="recipe-image-section">
+        <img src={recipe.photo} alt={recipe.name} />
+        <div className="actions">
+          {userId && (
+            <img
+              alt="review"
+              className="review"
+              onClick={() => {
+                setIsOpen(!isOpen);
+              }}
+              src="/review.svg"
+            />
+          )}
+          <label
+            onChange={(event) => handleRecipeImage(event.target)}
+            htmlFor="upload-image"
+            className="add"
+          >
+            <input
+              name=""
+              type="file"
+              id="upload-image"
+              className="file-input hidden w-full h-full"
+            />
 
-      <div className="actions">
-        {userId && (
-          <img
-            alt="review"
-            className="review"
-            onClick={() => {
-              setIsOpen(!isOpen);
-            }}
-            src="/review.svg"
-          />
-        )}
-        <label
-          onChange={(event) => handleRecipeImage(event.target)}
-          htmlFor="upload-image"
-          className="add"
-        >
-          <input
-            name=""
-            type="file"
-            id="upload-image"
-            className="file-input hidden w-full h-full"
-          />
-
-          <img className="add-image" src="/add.svg" alt="Add image" />
-        </label>
-      </div>
-
-      <div className="details__container">
+            <img className="add-image" src="/add.svg" alt="Add image" />
+          </label>
+        </div>
+      </section>
+      
+      <section className="recipe-details-section">
         <div className="details">
           <h2>{recipe.name}</h2>
 
@@ -87,8 +88,8 @@ const RecipeDetails = ({
           
           {children}
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 };
 
