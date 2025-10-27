@@ -27,10 +27,13 @@ export async function generateRecipe(ingredients, filters = {}) {
     // Parse the JSON response
     let recipeData;
     try {
-      recipeData = JSON.parse(text);
+      const cleanedText = cleanJsonResponse(text);
+      recipeData = JSON.parse(cleanedText);
     } catch (parseError) {
       console.error('Error parsing AI response:', parseError);
       console.error('Raw response:', text);
+      console.error('Cleaned response:', cleanJsonResponse(text));
+      console.error('First 200 chars of cleaned response:', cleanJsonResponse(text).substring(0, 200));
       throw new Error('Failed to parse recipe data from AI response');
     }
     
@@ -67,7 +70,25 @@ export async function generateRecipe(ingredients, filters = {}) {
   }
 }
 
-// Helper function to create a comprehensive prompt
+// Helper function to clean JSON response from markdown code blocks
+function cleanJsonResponse(text) {
+  // Remove markdown code blocks if present
+  let cleaned = text.trim();
+  
+  // Remove ```json or ``` from start
+  if (cleaned.startsWith('```json')) {
+    cleaned = cleaned.substring(7);
+  } else if (cleaned.startsWith('```')) {
+    cleaned = cleaned.substring(3);
+  }
+  
+  // Remove ``` from end
+  if (cleaned.endsWith('```')) {
+    cleaned = cleaned.substring(0, cleaned.length - 3);
+  }
+  
+  return cleaned.trim();
+}
 function createRecipePrompt(ingredients, filters) {
   let prompt = `Create a delicious recipe using these available ingredients: ${ingredients.join(', ')}.\n\n`;
   
