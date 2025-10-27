@@ -982,7 +982,6 @@ a {
 .featured-recipe__image {
   position: relative;
   height: 300px;
-  padding-left: 2rem;
 }
 
 .featured-recipe__image img {
