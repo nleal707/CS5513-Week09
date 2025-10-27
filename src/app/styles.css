@@ -12,6 +12,7 @@ body {
     ui-sans-serif,
     system-ui,
     -apple-system;
+  background-color: rgb(178 193 212);
 }
 
 ul {
@@ -204,13 +205,12 @@ header {
 }
 
 article {
-  margin: 0 auto;
-  background-color: rgb(229 234 240);
-  padding: 20px 40px;
-}
-
-article {
+  margin: 2rem auto;
+  padding: 2rem;
   width: 75%;
+  background-color: white; /*rgb(229 234 240)*/
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .recipes {
@@ -479,7 +479,7 @@ a {
 }
 
 .filter-menu {
-  background-color: white;
+  background-color: rgb(229 234 240);
   border-radius: 3px;
   border-bottom: 1px solid rgb(27 58 87);
 
