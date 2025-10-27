@@ -2,6 +2,7 @@ import { googleAI } from "@genkit-ai/googleai";
 import { genkit } from "genkit";
 import { Timestamp, addDoc, collection, getFirestore } from "firebase/firestore";
 import { getAuthenticatedAppForUser } from "@/src/lib/firebase/serverApp";
+import { getRecipeImage } from "@/src/lib/imageService";
 
 // Main function to generate a recipe based on available ingredients
 export async function generateRecipe(ingredients, filters = {}) {
@@ -61,7 +62,7 @@ export async function generateRecipe(ingredients, filters = {}) {
       avgRating: 0,
       numRatings: 0,
       sumRating: 0,
-      photo: getRandomRecipeImage(),
+      photo: await getRecipeImage(recipeData.name, recipeData.cuisineType),
     };
     
     return recipe;
@@ -130,7 +131,7 @@ Make sure the recipe is practical, delicious, and uses the provided ingredients 
   return prompt;
 }
 
-// Helper function to get a random recipe image
+// Helper function to get a random recipe image (kept for backward compatibility)
 function getRandomRecipeImage() {
   const imageNumbers = Array.from({ length: 22 }, (_, i) => i + 1);
   const randomIndex = Math.floor(Math.random() * imageNumbers.length);

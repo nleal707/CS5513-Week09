@@ -4,3 +4,5 @@ runConfig:
 env:
   - variable: GEMINI_API_KEY
     secret: GEMINI_API_KEY
+  - variable: UNSPLASH_ACCESS_KEY
+    secret: UNSPLASH_ACCESS_KEY

@@ -1,171 +1,196 @@
-<!-- 512fc21a-b873-4ecb-84b8-c9148b6ed18a 79d6e901-44e9-47d6-8aeb-cc1fa90cad37 -->
-# Restrict Recipe Generator to Authenticated Users
+<!-- 512fc21a-b873-4ecb-84b8-c9148b6ed18a 9d0d669d-d80f-48ae-9b3b-e474b8ef29ed -->
+# Improve Recipe Image Diversity
 
-## Overview
+## Current Situation
 
-Currently, unauthenticated users can access the ingredient input form and attempt to generate recipes, which results in an error "User must be authenticated to generate recipes". We need to hide the form from unauthenticated users and display a message encouraging them to log in.
-
-## Changes Required
-
-### 1. Update `src/app/page.js` (Server Component)
-
-Pass the current user information to `IngredientInputWrapper`:
+The project currently uses only **22 stock images** from a Firebase storage bucket that are randomly assigned to recipes:
 
 ```javascript
-export default async function Home(props) {
-  const searchParams = await props.searchParams;
-  const { firebaseServerApp, currentUser } = await getAuthenticatedAppForUser();
-  const db = getFirestore(firebaseServerApp);
-  const recipes = await getRecipes(db, searchParams);
-  const latestAIRecipe = await getLatestAIRecipe(db);
-  
-  return (
-    <main className="main__home">
-      <IngredientInputWrapper initialUserId={currentUser?.uid || ""} />
-      {latestAIRecipe && <FeaturedRecipe recipe={latestAIRecipe} />}
-      <RecipeListings
-        initialRecipes={recipes}
-        searchParams={searchParams}
-      />
-    </main>
-  );
+// src/lib/ai/recipeGenerator.js (line 134-138)
+function getRandomRecipeImage() {
+  const imageNumbers = Array.from({ length: 22 }, (_, i) => i + 1);
+  const randomIndex = Math.floor(Math.random() * imageNumbers.length);
+  return `https://storage.googleapis.com/firestorequickstarts.appspot.com/food_${imageNumbers[randomIndex]}.png`;
 }
 ```
 
-### 2. Update `src/components/IngredientInputWrapper.jsx`
+The same pattern is used in:
 
-Add user authentication check and pass userId to IngredientInput:
+- `src/lib/fakeRecipes.js` (line 105-108)
+- `src/lib/fakeRestaurants.js` (similar pattern)
+
+With only 22 images, repetition is very noticeable, especially as more recipes are generated.
+
+## Solution Options
+
+### Option 1: Integrate Unsplash API (Recommended)
+
+Use the free Unsplash API to fetch real, high-quality food photos dynamically based on recipe attributes.
+
+**Benefits:**
+
+- Unlimited unique images
+- High-quality professional photos
+- Searchable by keywords (e.g., "pasta carbonara", "chicken tikka")
+- Free tier allows 50 requests/hour (5,000/month)
+- Better user experience with relevant images
+
+**Implementation:**
+
+1. Sign up for Unsplash API key (free)
+2. Create helper function to fetch images by recipe name or cuisine type
+3. Update `getRandomRecipeImage()` to call Unsplash API
+4. Add fallback to stock images if API fails or rate limit reached
+5. Optionally cache image URLs in Firestore to reduce API calls
+
+### Option 2: Expand Seed Image Library
+
+Manually add 100-200 food images to the Firebase storage bucket.
+
+**Benefits:**
+
+- No external API dependencies
+- No rate limits
+- Works offline
+- Predictable behavior
+
+**Drawbacks:**
+
+- Still limited variety (just less noticeable)
+- Manual work to source and upload images
+- Storage costs (minimal but present)
+- Still eventual repetition with many recipes
+
+## Recommended Implementation: Unsplash API Integration
+
+### 1. Create Image Service Module
+
+Create `src/lib/imageService.js`:
 
 ```javascript
-"use client";
-
-import { useState } from "react";
-import IngredientInput from "@/src/components/IngredientInput.jsx";
-import LoadingScreen from "@/src/components/LoadingScreen.jsx";
-import { handleRecipeGeneration } from "@/src/app/actions.js";
-import { useUser } from "@/src/lib/getUser";
-
-export default function IngredientInputWrapper({ initialUserId }) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [isFadingOut, setIsFadingOut] = useState(false);
-  const userId = useUser()?.uid || initialUserId;
-
-  const onGenerateRecipes = async (ingredients) => {
-    if (!userId) {
-      alert("You must be logged in to generate recipes.");
-      return;
+// Fetch food image from Unsplash based on search term
+export async function getRecipeImage(recipeName, cuisineType) {
+  try {
+    if (!process.env.UNSPLASH_ACCESS_KEY) {
+      return getRandomRecipeImage(); // Fallback
     }
+
+    // Clean recipe name for search
+    const searchTerm = `${recipeName} food ${cuisineType}`.toLowerCase();
     
-    setIsLoading(true);
-    setIsFadingOut(false);
-    try {
-      const result = await handleRecipeGeneration(ingredients);
-      if (result.success) {
-        setIsFadingOut(true);
-        setTimeout(() => {
-          window.location.reload();
-        }, 500);
-      } else {
-        alert(`Error generating recipe: ${result.error}`);
-        setIsLoading(false);
+    const response = await fetch(
+      `https://api.unsplash.com/photos/random?query=${encodeURIComponent(searchTerm)}&orientation=landscape`,
+      {
+        headers: {
+          Authorization: `Client-ID ${process.env.UNSPLASH_ACCESS_KEY}`
+        }
       }
-    } catch (error) {
-      console.error("Error generating recipe:", error);
-      alert("Error generating recipe. Please try again.");
-      setIsLoading(false);
-    }
-  };
+    );
 
-  return (
-    <>
-      {isLoading && (
-        <LoadingScreen 
-          message="Generating your recipe..." 
-          className={isFadingOut ? "fade-out" : ""}
-        />
-      )}
-      <IngredientInput 
-        onGenerateRecipes={onGenerateRecipes} 
-        isLoading={isLoading}
-        userId={userId}
-      />
-    </>
-  );
+    if (!response.ok) {
+      throw new Error('Unsplash API error');
+    }
+
+    const data = await response.json();
+    return data.urls.regular; // Returns high-quality image URL
+  } catch (error) {
+    console.error('Error fetching image from Unsplash:', error);
+    return getRandomRecipeImage(); // Fallback to stock images
+  }
+}
+
+// Fallback to existing stock images
+function getRandomRecipeImage() {
+  const imageNumbers = Array.from({ length: 22 }, (_, i) => i + 1);
+  const randomIndex = Math.floor(Math.random() * imageNumbers.length);
+  return `https://storage.googleapis.com/firestorequickstarts.appspot.com/food_${imageNumbers[randomIndex]}.png`;
 }
 ```
 
-### 3. Update `src/components/IngredientInput.jsx`
+### 2. Update Recipe Generator
 
-Add conditional rendering to show login prompt when user is not authenticated:
+Modify `src/lib/ai/recipeGenerator.js`:
 
 ```javascript
-export default function IngredientInput({ onGenerateRecipes, isLoading, userId }) {
-  const [ingredients, setIngredients] = useState([]);
-  const [newIngredient, setNewIngredient] = useState("");
-  const [showSuggestions, setShowSuggestions] = useState(false);
+import { getRecipeImage } from '@/src/lib/imageService';
 
-  // ... existing functions ...
-
-  // If user is not authenticated, show login prompt
-  if (!userId) {
-    return (
-      <div className="ingredient-input">
-        <div className="ingredient-input__header">
-          <h2>AI-Powered Recipe Generator</h2>
-          <p>Sign in to generate personalized recipes based on your available ingredients</p>
-        </div>
-        <div className="ingredient-input__login-prompt">
-          <p>🔒 Please log in to use the recipe generator</p>
-          <p>Click "Sign In" in the top right corner to get started</p>
-        </div>
-      </div>
-    );
+export async function generateRecipe(ingredients, filters = {}) {
+  try {
+    // ... existing code ...
+    
+    const recipe = {
+      name: recipeData.name,
+      description: recipeData.description || `A delicious ${recipeData.cuisineType || 'homemade'} recipe`,
+      // ... other fields ...
+      photo: await getRecipeImage(recipeData.name, recipeData.cuisineType), // NEW
+    };
+    
+    return recipe;
+  } catch (error) {
+    // ... error handling ...
   }
-
-  // Existing component JSX for authenticated users
-  return (
-    <div className="ingredient-input">
-      {/* ... existing form ... */}
-    </div>
-  );
 }
 ```
 
-### 4. Add CSS for Login Prompt (Optional)
+### 3. Update Fake Recipe Generator
 
-Add styling for the login prompt in `src/app/styles.css`:
+Modify `src/lib/fakeRecipes.js`:
 
-```css
-.ingredient-input__login-prompt {
-  text-align: center;
-  padding: 2rem;
-  background: #f8f9fa;
-  border-radius: 8px;
-  margin: 1rem 0;
-}
+```javascript
+import { getRecipeImage } from '@/src/lib/imageService';
 
-.ingredient-input__login-prompt p {
-  margin: 0.5rem 0;
-  color: #666;
-}
-
-.ingredient-input__login-prompt p:first-child {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #333;
+export async function generateFakeRecipesAndReviews() {
+  // ... existing code ...
+  
+  const recipeData = {
+    name: recipeName,
+    // ... other fields ...
+    photo: await getRecipeImage(recipeName, cuisineType), // NEW
+  };
 }
 ```
 
-## Implementation Pattern
+### 4. Environment Configuration
 
-This follows the same authentication pattern used for:
+Add to environment variables (Firebase App Hosting):
 
-- Reviews (ReviewDialog only shown to authenticated users)
-- Photo uploads (upload button only shown to authenticated users)
-- Favorites (handled server-side with authentication check)
+```bash
+firebase apphosting:secrets:set UNSPLASH_ACCESS_KEY
+```
 
-## Security Notes
+### 5. Rate Limiting & Caching Considerations
 
-- Server-side validation already exists in `handleRecipeGeneration` (checks `currentUser`)
-- These changes add UI/UX improvements to prevent error messages
-- Users get clear guidance to log in rather than encountering errors
+- Unsplash free tier: 50 requests/hour
+- For high-volume apps, consider caching image URLs in Firestore
+- Could store `imageUrl` with recipe data on first generation
+- User-uploaded images bypass this entirely
+
+## Alternative: Hybrid Approach
+
+Combine both solutions:
+
+1. Use Unsplash for AI-generated recipes (new, unique content)
+2. Expand seed images to 50-100 for fake/seed data
+3. Allow user uploads for personalization
+
+This provides the best of both worlds with fallback options.
+
+## Files to Modify
+
+1. **Create:** `src/lib/imageService.js` - New image fetching service
+2. **Update:** `src/lib/ai/recipeGenerator.js` - Use new image service
+3. **Update:** `src/lib/fakeRecipes.js` - Use new image service  
+4. **Update:** `src/lib/fakeRestaurants.js` - Use new image service (if exists)
+5. **Configure:** Environment variables for Unsplash API key
+
+## Testing Plan
+
+1. Test with Unsplash API key configured
+2. Test fallback behavior without API key
+3. Test with network failures (should use fallback)
+4. Verify image quality and relevance
+5. Monitor API rate limits during usage
+
+## Implementation Approved
+
+User confirmed: Implement Option 1 with fallback mechanism. API key will be added later via `firebase apphosting:secrets:set UNSPLASH_ACCESS_KEY`.

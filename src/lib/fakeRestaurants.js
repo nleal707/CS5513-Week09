@@ -4,6 +4,7 @@ import {
   getRandomDateBefore,
 } from "@/src/lib/utils.js";
 import { randomData } from "@/src/lib/randomData.js";
+import { getRecipeImage } from "@/src/lib/imageService";
 
 import { Timestamp } from "firebase/firestore";
 
@@ -102,10 +103,10 @@ export async function generateFakeRecipesAndReviews() {
         (accumulator, currentValue) => accumulator + currentValue.rating,
         0
       ),
-      photo: `https://storage.googleapis.com/firestorequickstarts.appspot.com/food_${randomNumberBetween(
-        1,
-        22
-      )}.png`,
+      photo: await getRecipeImage(
+        randomData.recipeNames[randomNumberBetween(0, randomData.recipeNames.length - 1)],
+        randomData.cuisineTypes[randomNumberBetween(0, randomData.cuisineTypes.length - 1)]
+      ),
       timestamp: recipeTimestamp,
       aiGenerated: false,
     };
