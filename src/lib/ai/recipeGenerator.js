@@ -1,6 +1,7 @@
 import { gemini20Flash, googleAI } from "@genkit-ai/googleai";
 import { genkit } from "genkit";
-import { Timestamp } from "firebase/firestore";
+import { Timestamp, addDoc, collection, getFirestore } from "firebase/firestore";
+import { getAuthenticatedAppForUser } from "@/src/lib/firebase/serverApp";
 
 // Main function to generate a recipe based on available ingredients
 export async function generateRecipe(ingredients, filters = {}) {
@@ -151,4 +152,26 @@ export async function generateMultipleRecipes(ingredients, filters = {}, count =
   }
   
   return recipes;
+}
+
+// Function to save AI-generated recipe to Firestore
+export async function addRecipeToFirestore(recipe) {
+  try {
+    const { firebaseServerApp } = await getAuthenticatedAppForUser();
+    const db = getFirestore(firebaseServerApp);
+
+    const recipeData = {
+      ...recipe,
+      // Ensure all required fields are present
+      avgRating: recipe.avgRating || 0,
+      numRatings: recipe.numRatings || 0,
+      sumRating: recipe.sumRating || 0,
+    };
+
+    const docRef = await addDoc(collection(db, "recipes"), recipeData);
+    return docRef.id;
+  } catch (e) {
+    console.error("Error adding AI generated recipe to Firestore: ", e);
+    throw e;
+  }
 }
