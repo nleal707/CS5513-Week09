@@ -15,7 +15,9 @@ export async function GeminiSummary({ recipeId }) {
   if (!reviews || reviews.length === 0) {
     return (
       <div className="recipe__review_summary">
+        <h3>Review</h3>
         <p>No reviews yet. Be the first to review this recipe!</p>
+        <p>✨ Summarized with Gemini</p>
       </div>
     );
   }
@@ -47,6 +49,7 @@ export async function GeminiSummary({ recipeId }) {
 
     return (
       <div className="recipe__review_summary">
+        <h3>Review</h3>
         <p>{text}</p>
         <p>✨ Summarized with Gemini</p>
       </div>
