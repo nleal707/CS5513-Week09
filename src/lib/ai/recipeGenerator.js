@@ -1,57 +1,66 @@
-import { generateObject } from '@genkit-ai/ai';
-import { googleAI } from '@genkit-ai/googleai';
-import { z } from 'zod';
-
-// Define the schema for recipe generation
-const RecipeSchema = z.object({
-  name: z.string().describe('The name of the recipe'),
-  description: z.string().describe('A brief description of the recipe'),
-  ingredients: z.array(z.string()).describe('List of ingredients needed'),
-  instructions: z.array(z.string()).describe('Step-by-step cooking instructions'),
-  cuisineType: z.string().describe('The cuisine type (e.g., Italian, Chinese, American)'),
-  difficulty: z.enum(['Easy', 'Medium', 'Hard']).describe('Difficulty level'),
-  cookingTime: z.enum(['< 15 min', '15-30 min', '30-60 min', '60+ min']).describe('Estimated cooking time'),
-  dietaryRestrictions: z.array(z.string()).describe('Dietary restrictions this recipe accommodates'),
-  servings: z.number().describe('Number of servings'),
-  prepTime: z.string().describe('Estimated prep time'),
-  calories: z.number().optional().describe('Estimated calories per serving'),
-});
-
-// Create the recipe generation flow
-export const generateRecipeFromIngredients = generateObject({
-  model: googleAI('gemini-1.5-flash'),
-  schema: RecipeSchema,
-  config: {
-    temperature: 0.7,
-    maxOutputTokens: 2048,
-  },
-});
+import { gemini20Flash, googleAI } from "@genkit-ai/googleai";
+import { genkit } from "genkit";
+import { Timestamp } from "firebase/firestore";
 
 // Main function to generate a recipe based on available ingredients
 export async function generateRecipe(ingredients, filters = {}) {
   try {
+    // Check for required environment variable
+    if (!process.env.GEMINI_API_KEY) {
+      throw new Error(
+        'GEMINI_API_KEY not set. Set it with "firebase apphosting:secrets:set GEMINI_API_KEY"'
+      );
+    }
+
+    // Configure a Genkit instance
+    const ai = genkit({
+      plugins: [googleAI()],
+      model: gemini20Flash, // set default model
+    });
+
     // Create a prompt based on available ingredients and filters
     const prompt = createRecipePrompt(ingredients, filters);
     
     // Generate the recipe using Genkit
-    const result = await generateRecipeFromIngredients(prompt);
+    const { text } = await ai.generate(prompt);
     
-    if (result && result.object) {
-      // Add additional metadata
-      const recipe = {
-        ...result.object,
-        aiGenerated: true,
-        timestamp: new Date(),
-        avgRating: 0,
-        numRatings: 0,
-        sumRating: 0,
-        photo: getRandomRecipeImage(),
-      };
-      
-      return recipe;
-    } else {
-      throw new Error('Failed to generate recipe');
+    // Parse the JSON response
+    let recipeData;
+    try {
+      recipeData = JSON.parse(text);
+    } catch (parseError) {
+      console.error('Error parsing AI response:', parseError);
+      console.error('Raw response:', text);
+      throw new Error('Failed to parse recipe data from AI response');
     }
+    
+    // Validate required fields
+    if (!recipeData.name || !recipeData.ingredients || !recipeData.instructions) {
+      throw new Error('AI response missing required recipe fields');
+    }
+    
+    // Add additional metadata
+    const recipe = {
+      name: recipeData.name,
+      description: recipeData.description || `A delicious ${recipeData.cuisineType || 'homemade'} recipe`,
+      ingredients: Array.isArray(recipeData.ingredients) ? recipeData.ingredients : [recipeData.ingredients],
+      instructions: Array.isArray(recipeData.instructions) ? recipeData.instructions : [recipeData.instructions],
+      cuisineType: recipeData.cuisineType || 'International',
+      difficulty: recipeData.difficulty || 'Medium',
+      cookingTime: recipeData.cookingTime || '30-60 min',
+      dietaryRestrictions: Array.isArray(recipeData.dietaryRestrictions) ? recipeData.dietaryRestrictions : [],
+      servings: recipeData.servings || 4,
+      prepTime: recipeData.prepTime || '15 min',
+      calories: recipeData.calories || null,
+      aiGenerated: true,
+      timestamp: Timestamp.fromDate(new Date()),
+      avgRating: 0,
+      numRatings: 0,
+      sumRating: 0,
+      photo: getRandomRecipeImage(),
+    };
+    
+    return recipe;
   } catch (error) {
     console.error('Error generating recipe:', error);
     throw new Error('Failed to generate recipe. Please try again.');
@@ -79,17 +88,22 @@ function createRecipePrompt(ingredients, filters) {
     prompt += `The recipe should be suitable for: ${filters.dietaryRestrictions.join(', ')}.\n`;
   }
   
-  prompt += `\nPlease create a complete recipe with:
-- A creative and appetizing name
-- A brief description of the dish
-- Complete list of ingredients (you may suggest additional common ingredients if needed)
-- Clear, step-by-step cooking instructions
-- Appropriate cuisine type, difficulty level, and cooking time
-- Any dietary restrictions it accommodates
-- Number of servings and prep time
-- Optional calorie estimate per serving
+  prompt += `\nPlease create a complete recipe and return it as a valid JSON object with the following structure:
+{
+  "name": "Recipe Name",
+  "description": "Brief description of the dish",
+  "ingredients": ["ingredient 1", "ingredient 2", "ingredient 3"],
+  "instructions": ["Step 1", "Step 2", "Step 3"],
+  "cuisineType": "Italian/Chinese/American/etc",
+  "difficulty": "Easy/Medium/Hard",
+  "cookingTime": "< 15 min/15-30 min/30-60 min/60+ min",
+  "dietaryRestrictions": ["Vegetarian", "Vegan", "Gluten-Free", etc],
+  "servings": 4,
+  "prepTime": "15 min",
+  "calories": 300
+}
 
-Make sure the recipe is practical, delicious, and uses the provided ingredients as the main components.`;
+Make sure the recipe is practical, delicious, and uses the provided ingredients as the main components. Return ONLY the JSON object, no additional text.`;
 
   return prompt;
 }
