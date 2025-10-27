@@ -615,6 +615,10 @@ a {
 }
 
 /* Recipe-specific styles */
+.recipe__description__div {
+  margin: 1.5rem 0;
+}
+
 .recipe__description {
   margin: 1rem 0;
   color: #555;

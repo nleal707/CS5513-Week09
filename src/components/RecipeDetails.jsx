@@ -60,9 +60,12 @@ const RecipeDetails = ({
           </div>
           <p>{recipe.dietaryRestrictions?.join(", ") || "No restrictions"}</p>
           
-          {recipe.description && (
-            <p className="recipe__description">{recipe.description}</p>
-          )}
+          <div className="recipe__description__div">
+            <h3>Description:</h3>
+            {recipe.description && (
+              <p className="recipe__description">{recipe.description}</p>
+            )}
+          </div>
           
           {recipe.ingredients && recipe.ingredients.length > 0 && (
             <div className="recipe__ingredients">
