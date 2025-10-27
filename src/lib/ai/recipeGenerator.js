@@ -128,6 +128,7 @@ function createRecipePrompt(ingredients, filters) {
   }
   
   prompt += `\nPlease create a complete recipe and return it as a valid JSON object with the following structure:
+
 {
   "name": "Recipe Name",
   "description": "Brief description of the dish",
@@ -142,22 +143,7 @@ function createRecipePrompt(ingredients, filters) {
   "calories": 300
 }
 
-  prompt += `\nIMPORTANT: Return ONLY a valid JSON object. Do not include any markdown formatting, explanations, or additional text. The response must start with { and end with }.
-
-Example format:
-{
-  "name": "Recipe Name",
-  "description": "Brief description",
-  "ingredients": ["ingredient 1", "ingredient 2"],
-  "instructions": ["Step 1", "Step 2"],
-  "cuisineType": "Italian",
-  "difficulty": "Easy",
-  "cookingTime": "30-60 min",
-  "dietaryRestrictions": ["Vegetarian"],
-  "servings": 4,
-  "prepTime": "15 min",
-  "calories": 300
-}
+IMPORTANT: Return ONLY a valid JSON object. Do not include any markdown formatting, explanations, or additional text. The response must start with { and end with }.
 
 Make sure the recipe is practical, delicious, and uses the provided ingredients as the main components. Return ONLY the JSON object, no additional text.`;
 
