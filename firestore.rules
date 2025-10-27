@@ -17,9 +17,9 @@ service cloud.firestore {
     //   - Deletes are not allowed (default)
     match /recipes/{recipeId} {
       allow read;
+      allow create: if request.auth != null;
       allow update: if request.resource.data.lastReviewUserId != null;
       // allow write: if true;
-      // allow create: if request.auth != null;
       // allow update: if request.auth != null
       //              && unchanged("name");
       
